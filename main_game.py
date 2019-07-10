@@ -50,7 +50,7 @@ class player(object):
              self.walkCount += 1
         else:
           if self.right:
-            win.blit(walkRignt[0],(self.x,self.y))
+            win.blit(walkRight[0],(self.x,self.y))
           else:
             win.blit(walkLeft[0],(self.x,self.y))
             
