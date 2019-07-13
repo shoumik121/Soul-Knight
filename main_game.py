@@ -103,7 +103,8 @@ while run:
         
         
       if len(bullets) < 5:
-           bullets.append(projectile(round(man.x + man.width //2), round(man.y + man.height //2), 5,(139,0,0), facing))
+        bullets.append(
+                projectile(round(man.x + man.width // 2), round(man.y + man.height // 2), 6, (206, 32, 41), facing))
     
     if keys[pygame.K_LEFT] and man.x > man.vel:
         man.x -= man.vel
