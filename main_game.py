@@ -14,9 +14,9 @@ walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.ima
             pygame.image.load('L4.png'), pygame.image.load('L5.png'), pygame.image.load('L6.png'),
             pygame.image.load('L7.png'), pygame.image.load('L8.png'), pygame.image.load('L9.png')]
 
-#walkRight.reverse()
-#walkLeft = walkRight
-#walkRight.reverse()
+# walkRight.reverse()
+# walkLeft = walkRight
+# walkRight.reverse()
 
 bg = pygame.image.load('bg.jpg')
 char = pygame.image.load('standing.png')
@@ -41,44 +41,45 @@ class player(object):
     def draw(self, win):
         if self.walkCount + 1 >= 27:
             self.walkCount = 0
-        if not(self.standing):
-           if self.left:
-             win.blit(walkLeft[self.walkCount // 3], (self.x, self.y))
-             self.walkCount += 1
-           elif self.right:
-             win.blit(walkRight[self.walkCount // 3], (self.x, self.y))
-             self.walkCount += 1
+        if not (self.standing):
+            if self.left:
+                win.blit(walkLeft[self.walkCount // 3], (self.x, self.y))
+                self.walkCount += 1
+            elif self.right:
+                win.blit(walkRight[self.walkCount // 3], (self.x, self.y))
+                self.walkCount += 1
         else:
-          if self.right:
-            win.blit(walkRight[0],(self.x,self.y))
-          else:
-            win.blit(walkLeft[0],(self.x,self.y))
-            
+            if self.right:
+                win.blit(walkRight[0], (self.x, self.y))
+            else:
+                win.blit(walkLeft[0], (self.x, self.y))
+
+
 class projectile(object):
-  def _init_(self,x,y,radius,color,facing):
-    self.x = x
-    self.y = y
-    self.radius = radius
-    self.color = color
-    self.facing = facing
-    self.vel = 8 * facing
-    
-  def draw(self,win):
-    pygame.draw.circle(win, self.color, (self.x,self.y),self.radius)
+    def __init__(self,x,y,radius,color,facing):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+        self.facing = facing
+        self.vel = 8 * facing
+
+    def draw(self, win):
+        pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
 
 def redrawGameWindow():
     win.blit(bg, (0, 0))
     man.draw(win)
     for bullet in bullets:
-       bullet.draw(win)
+        bullet.draw(win)
 
     pygame.display.update()
 
 
 # mainloop
 man = player(200, 410, 64, 64)
-bullets=[]
+bullets = []
 run = True
 while run:
     clock.tick(27)
@@ -87,25 +88,23 @@ while run:
         if event.type == pygame.QUIT:
             run = False
     for bullet in bullets:
-      if bullet.x < 500 and bullet.x > 0:
-         bullet.x += bullet.vel
-      else:
-         bullets.pop(bullets.index(bullet))
-          
-           
+        if bullet.x < 480 and bullet.x > 0:
+            bullet.x += bullet.vel
+        else:
+            bullets.pop(bullets.index(bullet))
+
     keys = pygame.key.get_pressed()
-    
+
     if keys[pygame.K_SPACE]:
-      if man.left:
-        facing = -1
-      else:
-        facing = 1
-        
-        
-      if len(bullets) < 5:
-        bullets.append(
+        if man.left:
+            facing = -1
+        else:
+            facing = 1
+
+        if len(bullets) < 5:
+            bullets.append(
                 projectile(round(man.x + man.width // 2), round(man.y + man.height // 2), 6, (206, 32, 41), facing))
-    
+
     if keys[pygame.K_LEFT] and man.x > man.vel:
         man.x -= man.vel
         man.left = True
