@@ -118,7 +118,7 @@ class enemy(object):
 def redrawGameWindow():
     win.blit(bg, (0, 0))
     man.draw(win)
-   arc.draw(win)
+    arc.draw(win)
     for bullet in bullets:
         bullet.draw(win)
         
