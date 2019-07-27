@@ -14,14 +14,13 @@ walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.ima
             pygame.image.load('L4.png'), pygame.image.load('L5.png'), pygame.image.load('L6.png'),
             pygame.image.load('L7.png'), pygame.image.load('L8.png'), pygame.image.load('L9.png')]
 
-# walkRight.reverse()
-# walkLeft = walkRight
-# walkRight.reverse()
+
 
 bg = pygame.image.load('bg.jpg')
 
 
 clock = pygame.time.Clock()
+score = 0
 
 
 class player(object):
@@ -54,8 +53,10 @@ class player(object):
                 win.blit(walkRight[0], (self.x, self.y))
             else:
                 win.blit(walkLeft[0], (self.x, self.y))
+
+
         self.hitbox = (self.x + 14, self.y, 42, 60)
-        pygame.draw.rect(win,(255,0,0), self.hitbox, 2)
+        #pygame.draw.rect(win,(255,0,0), self.hitbox, 2)
 
 
 class projectile(object):
@@ -90,20 +91,25 @@ class enemy(object):
         self.walkCount = 0
         self.vel = 3
         self.hitbox = (self.x + 14, self.y, 38, 60)
+        self.health = 9
+        self.v = True
 
     def draw(self, win):
-        self.move()
-        if self.walkCount + 1 >= 33:
-            self.walkCount = 0
+        if self.v:
+            self.move()
+            if self.walkCount + 1 >= 33:
+                self.walkCount = 0
 
-        if self.vel > 0:
-            win.blit(self.walkRight[self.walkCount // 3], (self.x, self.y))
-            self.walkCount += 1
-        else:
-            win.blit(self.walkLeft[self.walkCount // 3], (self.x, self.y))
-            self.walkCount += 1
-        self.hitbox = (self.x + 14, self.y, 38, 60)
-        pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
+            if self.vel > 0:
+                win.blit(self.walkRight[self.walkCount // 3], (self.x, self.y))
+                self.walkCount += 1
+            else:
+                win.blit(self.walkLeft[self.walkCount // 3], (self.x, self.y))
+                self.walkCount += 1
+            pygame.draw.rect(win, (255, 0, 0), (self.hitbox[0], self.hitbox[1] - 20, 45, 10))
+            pygame.draw.rect(win, (0, 255, 0), (self.hitbox[0], self.hitbox[1] - 20, 50 - (5 * (10 - self.health)), 10))
+            self.hitbox = (self.x + 14, self.y, 38, 60)
+        #pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
 
     def move(self):
         if self.vel > 0:
@@ -122,10 +128,16 @@ class enemy(object):
                 self.walkCount = 0
 
     def hit(self):
+        if self.health > 0:
+            self.health -= 1
+        else:
+            self.v = False
         print('HIT')
 
 def redrawGameWindow():
     win.blit(bg, (0, 0))
+    text= font.render('Score: ' + str(score),1, (255,255,255))
+    win.blit(text, (385,10))
     man.draw(win)
     arc.draw(win)
     for bullet in bullets:
@@ -135,6 +147,7 @@ def redrawGameWindow():
 
 
 # mainloop
+font = pygame.font.SysFont('comicsans', 30, True)
 man = player(200, 418, 64, 64)
 arc = enemy(40, 418, 64, 64, 400)
 hitloop = 0
@@ -155,6 +168,7 @@ while run:
         if bullet.y - bullet.radius < arc.hitbox[1] + arc.hitbox[3] and bullet.y + bullet.radius > arc.hitbox[1]:
             if bullet.x + bullet.radius > arc.hitbox[0] and bullet.x - bullet.radius < arc.hitbox[0] + arc.hitbox[2]:
                 arc.hit()
+                score += 1
                 bullets.pop(bullets.index(bullet))
 
         if bullet.x < 500 and bullet.x > 0:
