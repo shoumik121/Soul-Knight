@@ -17,9 +17,13 @@ walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.ima
 
 
 bg = pygame.image.load('bg.jpg')
-
-
 clock = pygame.time.Clock()
+
+bulletSound = pygame.mixer.Sound("GUN_FIRE-GoodSoundForYou-820112263.wav")
+hitSound = pygame.mixer.Sound("Thwack Hit By Punch-SoundBible.com-872409685.wav")
+
+music = pygame.mixer.music.load("Energy (8 Bit Remix Cover Version) [Tribute to Drake] - 8 Bit Universe.mp3")
+pygame.mixer.music.play(-1)
 score = 0
 
 
@@ -167,6 +171,7 @@ while run:
     for bullet in bullets:
         if bullet.y - bullet.radius < arc.hitbox[1] + arc.hitbox[3] and bullet.y + bullet.radius > arc.hitbox[1]:
             if bullet.x + bullet.radius > arc.hitbox[0] and bullet.x - bullet.radius < arc.hitbox[0] + arc.hitbox[2]:
+                hitSound.play()
                 arc.hit()
                 score += 1
                 bullets.pop(bullets.index(bullet))
@@ -179,6 +184,7 @@ while run:
     keys = pygame.key.get_pressed()
 
     if keys[pygame.K_SPACE] and hitloop == 0:
+        bulletSound.play()
         if man.left:
             facing = -1
         else:
