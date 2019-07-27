@@ -2,7 +2,7 @@ import pygame
 
 pygame.init()
 
-win = pygame.display.set_mode((480, 480))
+win = pygame.display.set_mode((500, 480))
 
 pygame.display.set_caption("SOUL KNIGHT")
 
@@ -19,7 +19,7 @@ walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.ima
 # walkRight.reverse()
 
 bg = pygame.image.load('bg.jpg')
-char = pygame.image.load('standing.png')
+
 
 clock = pygame.time.Clock()
 
@@ -37,6 +37,7 @@ class player(object):
         self.walkCount = 0
         self.jumpCount = 10
         self.standing = True
+        self.hitbox = (self.x + 14, self.y, 42, 60)
 
     def draw(self, win):
         if self.walkCount + 1 >= 27:
@@ -53,10 +54,12 @@ class player(object):
                 win.blit(walkRight[0], (self.x, self.y))
             else:
                 win.blit(walkLeft[0], (self.x, self.y))
+        self.hitbox = (self.x + 14, self.y, 42, 60)
+        pygame.draw.rect(win,(255,0,0), self.hitbox, 2)
 
 
 class projectile(object):
-    def __init__(self,x,y,radius,color,facing):
+    def __init__(self, x, y, radius, color, facing):
         self.x = x
         self.y = y
         self.radius = radius
@@ -66,7 +69,8 @@ class projectile(object):
 
     def draw(self, win):
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
-        
+
+
 class enemy(object):
     walkRight = [pygame.image.load('R1E.png'), pygame.image.load('R2E.png'), pygame.image.load('R3E.png'),
                  pygame.image.load('R4E.png'), pygame.image.load('R5E.png'), pygame.image.load('R6E.png'),
@@ -85,6 +89,7 @@ class enemy(object):
         self.path = [x, end]
         self.walkCount = 0
         self.vel = 3
+        self.hitbox = (self.x + 14, self.y, 38, 60)
 
     def draw(self, win):
         self.move()
@@ -97,6 +102,8 @@ class enemy(object):
         else:
             win.blit(self.walkLeft[self.walkCount // 3], (self.x, self.y))
             self.walkCount += 1
+        self.hitbox = (self.x + 14, self.y, 38, 60)
+        pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
 
     def move(self):
         if self.vel > 0:
@@ -114,6 +121,8 @@ class enemy(object):
                 self.x += self.vel
                 self.walkCount = 0
 
+    def hit(self):
+        print('HIT')
 
 def redrawGameWindow():
     win.blit(bg, (0, 0))
@@ -121,30 +130,41 @@ def redrawGameWindow():
     arc.draw(win)
     for bullet in bullets:
         bullet.draw(win)
-        
+
     pygame.display.update()
 
 
 # mainloop
-man = player(200, 415, 64, 64)
+man = player(200, 418, 64, 64)
 arc = enemy(40, 418, 64, 64, 400)
+hitloop = 0
 bullets = []
 run = True
 while run:
     clock.tick(27)
 
+    if hitloop>0:
+        hitloop += 1
+    if hitloop>22:
+        hitloop = 0
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
     for bullet in bullets:
-        if bullet.x < 480 and bullet.x > 0:
+        if bullet.y - bullet.radius < arc.hitbox[1] + arc.hitbox[3] and bullet.y + bullet.radius > arc.hitbox[1]:
+            if bullet.x + bullet.radius > arc.hitbox[0] and bullet.x - bullet.radius < arc.hitbox[0] + arc.hitbox[2]:
+                arc.hit()
+                bullets.pop(bullets.index(bullet))
+
+        if bullet.x < 500 and bullet.x > 0:
             bullet.x += bullet.vel
         else:
             bullets.pop(bullets.index(bullet))
 
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_SPACE]:
+    if keys[pygame.K_SPACE] and hitloop == 0:
         if man.left:
             facing = -1
         else:
@@ -152,7 +172,8 @@ while run:
 
         if len(bullets) < 5:
             bullets.append(
-                projectile(round(man.x + man.width // 2), round(man.y + man.height // 2), 6, (206, 32, 41), facing))
+                projectile(round(man.x + man.width // 2), round(man.y + man.height // 2), 6, (100, 170, 255), facing))
+            hitloop = 1
 
     if keys[pygame.K_LEFT] and man.x > man.vel:
         man.x -= man.vel
