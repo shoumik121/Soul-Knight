@@ -118,7 +118,7 @@ class enemy(object):
 def redrawGameWindow():
     win.blit(bg, (0, 0))
     man.draw(win)
-    g.draw(win)
+   arc.draw(win)
     for bullet in bullets:
         bullet.draw(win)
         
@@ -127,7 +127,7 @@ def redrawGameWindow():
 
 # mainloop
 man = player(200, 415, 64, 64)
-g = enemy(40, 418, 64, 64, 400)
+arc = enemy(40, 418, 64, 64, 400)
 bullets = []
 run = True
 while run:
